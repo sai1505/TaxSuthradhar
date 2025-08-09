@@ -1,71 +1,153 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import DashboardNav from './components/DashboardNav';
 import Footer from './components/Footer';
-import { BookOpen, Clock } from 'lucide-react';
+import { ArrowUp, Sparkles, User } from 'lucide-react';
 
-// This component receives 'user' and 'onLogout' from App.jsx
 const Dashboard = ({ user, onLogout }) => {
+    // --- STATE, EFFECTS, and LOGIC (No changes needed) ---
+    const [prompt, setPrompt] = useState('');
+    const [messages, setMessages] = useState([
+        {
+            sender: 'ai',
+            text: `Hello, ${user?.name || 'there'}! How can I help you analyze your tax documents today?`
+        }
+    ]);
+    const [isLoading, setIsLoading] = useState(false);
+    const chatEndRef = useRef(null);
 
     useEffect(() => {
-        // Set a class on the root element for dashboard-specific styles if needed
-        document.documentElement.classList.add('dashboard-view');
-        // Cleanup on unmount
+        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages]);
+
+    // Effect for dark theme body background
+    useEffect(() => {
+        document.documentElement.style.backgroundColor = '#000000'; // Set base body color to black
         return () => {
-            document.documentElement.classList.remove('dashboard-view');
+            document.documentElement.style.backgroundColor = ''; // Revert on unmount
         };
     }, []);
 
+    const handleSendMessage = async (e) => {
+        e.preventDefault();
+        if (!prompt.trim()) return;
+
+        setIsLoading(true);
+        const currentPrompt = prompt;
+        const userMessage = { sender: 'user', text: currentPrompt };
+
+        setMessages(prev => [...prev, userMessage]);
+        setPrompt('');
+
+        try {
+            const chatResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/chat`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: currentPrompt })
+            });
+
+            if (!chatResponse.ok) {
+                if (chatResponse.status === 401 || chatResponse.status === 403) {
+                    alert("Your session has expired. Please log in again.");
+                    onLogout();
+                    return;
+                }
+                const errorData = await chatResponse.json();
+                throw new Error(errorData.message || 'Failed to get response from AI.');
+            }
+
+            const chatData = await chatResponse.json();
+            const aiMessage = { sender: 'ai', text: chatData.response };
+            setMessages(prev => [...prev, aiMessage]);
+
+        } catch (error) {
+            console.error("Error sending message:", error);
+            const errorMessage = { sender: 'ai', text: `Sorry, an error occurred: ${error.message}` };
+            setMessages(prev => [...prev, errorMessage]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // --- RENDER (Updated for Dark Theme) ---
     return (
-        <div className="flex flex-col min-h-screen bg-gray-900">
-            {/* It then passes 'user' and 'onLogout' down to DashboardNav */}
-            <DashboardNav user={user} onLogout={onLogout} />
+        // Main container with a black background and light text
+        <div className="flex flex-col h-screen bg-black text-gray-200">
+            <DashboardNav user={user} onLogout={onLogout} activePage="new-chat" />
 
-            <main className="flex-grow">
-                <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-                    <div className="pb-5 border-b border-gray-700 mb-8">
-                        <h1 className="text-3xl font-bold leading-tight text-white">
-                            Dashboard
-                        </h1>
-                        <p className="mt-2 text-lg text-gray-400">
-                            Welcome back, {user?.name || user?.email}! Here's a summary of your account.
-                        </p>
-                    </div>
+            <main className="flex-1 flex flex-col overflow-hidden">
+                {/* Chat messages container */}
+                <div className="flex-1 overflow-y-auto p-4 md:p-6">
+                    <div className="max-w-4xl mx-auto space-y-6">
+                        {messages.map((message, index) => (
+                            <div
+                                key={index}
+                                className={`flex items-end gap-3 ${message.sender === 'user' ? 'justify-end' : 'justify-start'
+                                    }`}
+                            >
+                                {/* AI AVATAR */}
+                                {message.sender === 'ai' && (
+                                    <div className="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center bg-white">
+                                        <Sparkles className="h-5 w-5 text-black" />
+                                    </div>
+                                )}
 
-                    {/* Main content grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {/* Card 1: Recent Activity */}
-                        <div className="bg-black rounded-lg shadow-lg p-6">
-                            <h3 className="text-xl font-semibold text-white mb-4">Recent Activity</h3>
-                            <ul className="space-y-4 text-gray-300">
-                                <li className="flex items-center"><BookOpen className="h-5 w-5 mr-3 text-blue-400" /> Document "Q4_Report.pdf" uploaded.</li>
-                                <li className="flex items-center"><Clock className="h-5 w-5 mr-3 text-green-400" /> Analysis complete for "Tax_2023.csv".</li>
-                                <li className="flex items-center"><BookOpen className="h-5 w-5 mr-3 text-blue-400" /> Document "Invoice_123.pdf" added.</li>
-                            </ul>
-                        </div>
+                                {/* MESSAGE BUBBLE */}
+                                <div className={`max-w-lg rounded-2xl px-4 py-2.5 ${message.sender === 'user'
+                                    ? 'bg-gray-700 text-white rounded-br-none'
+                                    : 'bg-gray-800 text-gray-200 rounded-bl-none'
+                                    }`}>
+                                    <p className="leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                                </div>
 
-                        {/* Card 2: Quick Actions */}
-                        <div className="bg-black rounded-lg shadow-lg p-6">
-                            <h3 className="text-xl font-semibold text-white mb-4">Quick Actions</h3>
-                            <div className="flex flex-col space-y-3">
-                                <button className="w-full text-left bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                                    Upload New Document
-                                </button>
-                                <button className="w-full text-left bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                                    View Full History
-                                </button>
+                                {/* USER AVATAR */}
+                                {message.sender === 'user' && (
+                                    <div className="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center bg-gray-600">
+                                        <User className="h-5 w-5 text-gray-300" />
+                                    </div>
+                                )}
                             </div>
-                        </div>
-
-                        {/* Card 3: Account Status */}
-                        <div className="bg-black rounded-lg shadow-lg p-6">
-                            <h3 className="text-xl font-semibold text-white mb-4">Account Status</h3>
-                            <div className="space-y-3 text-gray-300">
-                                <p><strong>Plan:</strong> Premium</p>
-                                <p><strong>Documents Analyzed:</strong> 42</p>
-                                <p><strong>Member Since:</strong> Jan 1, 2023</p>
-                            </div>
-                        </div>
+                        ))}
+                        <div ref={chatEndRef} />
                     </div>
+                </div>
+
+                {/* Input form area */}
+                <div className="w-full px-4 pb-4 md:px-6 md:pb-6 bg-black">
+                    <form onSubmit={handleSendMessage} className="max-w-4xl mx-auto">
+                        <div className="flex items-center gap-2 md:gap-3 p-2 bg-gray-900 rounded-xl border border-gray-700">
+                            <textarea
+                                value={prompt}
+                                onChange={(e) => setPrompt(e.target.value)}
+                                placeholder="Message TaxAI..."
+                                disabled={isLoading}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleSendMessage(e);
+                                    }
+                                }}
+                                className="flex-1 bg-transparent resize-none outline-none text-gray-200 placeholder-gray-500 max-h-48"
+                                rows="1"
+                                onInput={(e) => {
+                                    e.target.style.height = 'auto';
+                                    e.target.style.height = `${e.target.scrollHeight}px`;
+                                }}
+                            />
+                            <button
+                                type="submit"
+                                className="p-2.5 bg-white text-black rounded-lg transition-colors hover:bg-gray-300 disabled:bg-gray-800 disabled:text-gray-500 disabled:cursor-not-allowed"
+                                disabled={!prompt.trim() || isLoading}
+                            >
+                                {isLoading ? (
+                                    <div className="w-5 h-5 border-t-2 border-black rounded-full animate-spin"></div>
+                                ) : (
+                                    <ArrowUp className="h-5 w-5" />
+                                )}
+                                <span className="sr-only">Send</span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </main>
 

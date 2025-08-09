@@ -44,6 +44,7 @@ const SignIn = ({ onLoginSuccess, onNavigate }) => {
             // The fetch request uses the absolute URL of your backend server.
             const response = await fetch('http://localhost:5000/api/signin', {
                 method: 'POST',
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
             });
@@ -80,6 +81,7 @@ const SignIn = ({ onLoginSuccess, onNavigate }) => {
             // 3. Send this ID token to your backend for verification via a POST request.
             const response = await fetch('http://localhost:5000/api/auth/google', {
                 method: 'POST',
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ idToken }),
             });

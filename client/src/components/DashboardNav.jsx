@@ -50,7 +50,6 @@ const DashboardNav = ({ user, onLogout, onNavigate, activePage }) => {
     return (
         <>
             <header className="bg-black border-b border-gray-800 sticky top-0 z-50">
-                {/* MODIFICATION: Layout now perfectly matches the main Navbar. Padding is py-3. */}
                 <nav className="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
                     <button
                         onClick={() => handleNavClick('new-chat')}
@@ -59,10 +58,10 @@ const DashboardNav = ({ user, onLogout, onNavigate, activePage }) => {
                         Tax Suthradhar
                     </button>
 
-                    {/* MODIFICATION: Desktop links and profile menu are grouped on the right. */}
                     <div className="hidden md:flex items-center space-x-2">
                         {navLinks.map((link) => {
-                            const isActive = activePage === link.page;
+                            // A link is active if it matches the active page, but "New Chat" is never considered active.
+                            const isActive = activePage === link.page && link.page !== 'new-chat';
                             return (
                                 <button
                                     key={link.title}
@@ -79,7 +78,6 @@ const DashboardNav = ({ user, onLogout, onNavigate, activePage }) => {
                             );
                         })}
 
-                        {/* Profile Dropdown is now part of the right-side group */}
                         <div className="ml-3 relative" ref={profileMenuRef}>
                             <div>
                                 <button onClick={() => setProfileMenuOpen(!profileMenuOpen)} className="max-w-xs bg-gray-800 rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-white">
@@ -91,7 +89,7 @@ const DashboardNav = ({ user, onLogout, onNavigate, activePage }) => {
                             </div>
                             {profileMenuOpen && (
                                 <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg py-1 bg-gray-900 ring-1 ring-black ring-opacity-5">
-                                      <div className="px-4 py-3 border-b border-gray-700">
+                                    <div className="px-4 py-3 border-b border-gray-700">
                                         <p className="text-sm text-gray-400">Signed in as</p>
                                         <p className="text-sm font-medium text-white truncate" title={userEmail}>
                                             {userEmail}
@@ -114,9 +112,8 @@ const DashboardNav = ({ user, onLogout, onNavigate, activePage }) => {
                 </nav>
             </header>
 
-            {/* Full-screen mobile menu - structure remains the same */}
             <div className={`fixed inset-0 bg-black z-50 transition-opacity duration-300 ease-in-out md:hidden ${menuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                 <div className={`absolute inset-0 transform transition-transform duration-300 ease-in-out ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+                <div className={`absolute inset-0 transform transition-transform duration-300 ease-in-out ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
                     <div className="flex justify-end p-5">
                         <button onClick={() => setMenuOpen(false)} className="text-white p-2 rounded-md">
                             <X size={32} />
@@ -125,20 +122,21 @@ const DashboardNav = ({ user, onLogout, onNavigate, activePage }) => {
                     <div className="flex flex-col justify-between h-[calc(100vh-80px)]">
                         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                             {navLinks.map((link) => {
-                                const isActive = activePage === link.page;
+                                // A link is active if it matches the active page, but "New Chat" is never considered active.
+                                const isActive = activePage === link.page && link.page !== 'new-chat';
                                 return (
-                                <button
-                                    key={link.title}
-                                    onClick={() => handleNavClick(link.page)}
-                                    className={`flex items-center justify-center w-full text-2xl font-medium py-4 rounded-md transition-colors duration-300 
+                                    <button
+                                        key={link.title}
+                                        onClick={() => handleNavClick(link.page)}
+                                        className={`flex items-center justify-center w-full text-2xl font-medium py-4 rounded-md transition-colors duration-300 
                                     ${isActive
-                                        ? 'text-white bg-gray-900'
-                                        : 'text-gray-400 hover:text-white'
-                                    }`}
-                                >
-                                    {link.icon}
-                                    {link.title}
-                                </button>
+                                                ? 'text-white bg-gray-900'
+                                                : 'text-gray-400 hover:text-white'
+                                            }`}
+                                    >
+                                        {link.icon}
+                                        {link.title}
+                                    </button>
                                 );
                             })}
                         </div>

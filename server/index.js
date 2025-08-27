@@ -7,6 +7,9 @@ const admin = require('firebase-admin');
 const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/authRoutes');
 const chatRoutes = require('./routes/chatRoutes');
+const historyRoutes = require('./routes/historyRoutes');
+const analyzeRoutes = require('./routes/analyzeRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 
 console.log("✅ JWT Secret Loaded in index.js:", process.env.JWT_SECRET);
 
@@ -33,6 +36,9 @@ app.get('/', (req, res) => {
 
 app.use('/api', authRoutes);
 app.use('/api', chatRoutes);
+app.use('/api', historyRoutes);
+app.use('/api', analyzeRoutes);
+app.use('/api', uploadRoutes);
 
 // Central Error Handler
 app.use((err, req, res, next) => {

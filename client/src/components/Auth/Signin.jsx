@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import {
+    GoogleAuthProvider,
+    signInWithPopup,
+    signInWithEmailAndPassword
+} from "firebase/auth";
+import { auth } from '../../firebase';
 
 // NEW: 2D Animation for the Sign-in Page
 const SignInVisualAnimation = () => (
@@ -33,16 +39,49 @@ const Signin = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSignin = (e) => {
+
+    // NEW: Handle Google Sign-in (same logic as signup)
+    const handleGoogleSignIn = async () => {
+        const provider = new GoogleAuthProvider();
+        try {
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+            console.log("Google Sign-In Success:", user);
+            alert(`Welcome back, ${user.displayName}!`);
+            // Redirect user to the dashboard or home page
+            navigate('/dashboard');
+        } catch (error) {
+            console.error("Google Sign-In Error:", error);
+            alert(`Error: ${error.message}`);
+        }
+    };
+
+    // MODIFIED: Handle standard email and password sign-in
+    const handleSignin = async (e) => {
         e.preventDefault();
         if (!email || !password) {
             alert('Please enter both email and password.');
             return;
         }
-        alert(`Signing in with:\nEmail: ${email}`);
-        // Reset fields after submission
-        setEmail('');
-        setPassword('');
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            // Signed in 
+            const user = userCredential.user;
+            console.log("Email Sign-In Success:", user);
+            alert(`Welcome back, ${user.email}!`);
+            // Redirect to the dashboard
+            navigate('/dashboard');
+        } catch (error) {
+            console.error("Email Sign-In Error:", error);
+            // Provide user-friendly error messages
+            let errorMessage = "Failed to sign in. Please check your credentials.";
+            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                errorMessage = "Invalid email or password. Please try again.";
+            } else if (error.code === 'auth/invalid-credential') {
+                errorMessage = "Invalid credentials provided.";
+            }
+            alert(errorMessage);
+        }
     };
 
     return (
@@ -104,7 +143,7 @@ const Signin = () => {
                 {/* Google Sign-in Button */}
                 <button
                     className="w-full flex items-center justify-center px-6 py-3 border border-white text-white rounded-md text-lg font-semibold hover:bg-white hover:text-black transition-colors duration-300 transform hover:scale-105 mb-6"
-                    onClick={() => alert('Initiating Google Sign-in... (Not functional in demo)')}
+                    onClick={handleGoogleSignIn}
                 >
                     <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google logo" className="w-6 h-6 mr-3" />
                     Sign in with Google

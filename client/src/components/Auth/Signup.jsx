@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from '../../firebase';
 
 // NEW: 2D Animation for the left side of the form
 const SignupVisualAnimation = () => (
@@ -37,6 +39,24 @@ const Signup = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+
+    // NEW: Handle Google Sign-in
+    const handleGoogleSignIn = async () => {
+        const provider = new GoogleAuthProvider();
+        try {
+            const result = await signInWithPopup(auth, provider);
+            // The signed-in user info.
+            const user = result.user;
+            console.log("Google Sign-In Success:", user);
+            alert(`Welcome, ${user.displayName}!`);
+            // Redirect user to the dashboard or home page after successful sign-in
+            navigate('/dashboard');
+        } catch (error) {
+            // Handle Errors here.
+            console.error("Google Sign-In Error:", error);
+            alert(`Error: ${error.message}`);
+        }
+    };
 
     const handleSignup = (e) => {
         e.preventDefault();
@@ -119,7 +139,7 @@ const Signup = () => {
                 {/* Google Sign-up Button */}
                 <button
                     className="w-full flex items-center justify-center px-6 py-3 border border-white text-white rounded-md text-lg font-semibold hover:bg-white hover:text-black transition-colors duration-300 transform hover:scale-105 mb-6"
-                    onClick={() => alert('Initiating Google Sign-up... (Not functional in demo)')}
+                    onClick={handleGoogleSignIn}
                 >
                     <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google logo" className="w-6 h-6 mr-3" />
                     Sign up with Google

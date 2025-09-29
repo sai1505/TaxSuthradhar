@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 // --- NEW/UPDATED ANIMATED SVG ICONS ---
 
@@ -206,6 +207,16 @@ const Home = () => {
                     </div>
                 </div>
             </section>
+            <div className="w-full flex justify-center">
+                <Link
+                    to="/signup"
+                    className="bg-white text-black px-8 py-3 mb-16 rounded-md font-bold text-lg hover:bg-gray-200 transition-all duration-300 transform hover:scale-105 inline-block animate-on-scroll"
+                    style={{ transitionDelay: '400ms' }}
+                >
+                    Get Started
+                </Link>
+            </div>
+
         </div>
     );
 };

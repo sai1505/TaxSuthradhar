@@ -1,17 +1,27 @@
-// index.js
-const express = require("express");
+// Import necessary packages
+import express from 'express';
+import cors from 'cors';
+import 'dotenv/config'; // Loads environment variables from .env file
+
+// Import routes
+import authRoutes from './routes/auth.js';
+
+// --- Server Setup ---
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(express.json());
-
-// Routes
-app.get("/", (req, res) => {
-  res.send("Hello, World! 🚀 Express server is running.");
+// --- Middleware ---
+app.use(cors()); // Enable Cross-Origin Resource Sharing for your frontend
+app.use(express.json()); // Enable the express app to parse JSON formatted request bodies
+app.get('/', (req, res) => {
+  res.send('Hello World!');
 });
 
-// Start server
+// --- API Routes ---
+// All routes defined in auth.js will be prefixed with /api
+app.use('/api', authRoutes);
+
+// --- Start Server ---
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });

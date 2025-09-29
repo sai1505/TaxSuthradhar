@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from '../../firebase';
@@ -33,12 +33,52 @@ const SignupVisualAnimation = () => (
     </div>
 );
 
+// This component will be our visual pop-up message
+const Notification = ({ message, type, onClose }) => {
+    const isSuccess = type === 'success';
+
+    return (
+        <div
+            className={`fixed bottom-30 right-5 flex items-center p-4 w-full max-w-xs text-black bg-white rounded-lg shadow-lg animate-slideIn`}
+            role="alert"
+        >
+            <div className="text-sm font-normal">{message}</div>
+            <button
+                type="button"
+                className="ms-auto -mx-1.5 -my-1.5 rounded-lg p-1.5 inline-flex items-center justify-center h-8 w-8 text-gray-500 hover:text-black hover:bg-gray-100"
+                onClick={onClose}
+                aria-label="Close"
+            >
+                <span className="sr-only">Close</span>
+                <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                </svg>
+            </button>
+        </div>
+    );
+};
+
 
 const Signup = () => {
     // State to hold email and password input data
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+
+    // State for API call status and feedback
+    const [isLoading, setIsLoading] = useState(false);
+    const [error] = useState(null);
+    const [successMessage] = useState(null);
+    const [notification, setNotification] = useState(null);
+
+    useEffect(() => {
+        if (notification) {
+            const timer = setTimeout(() => {
+                setNotification(null);
+            }, 5000);
+            return () => clearTimeout(timer); // Cleanup timer if component unmounts
+        }
+    }, [notification]);
 
     // NEW: Handle Google Sign-in
     const handleGoogleSignIn = async () => {
@@ -58,19 +98,45 @@ const Signup = () => {
         }
     };
 
-    const handleSignup = (e) => {
+    const handleSignup = async (e) => {
         e.preventDefault();
+        setNotification(null);
+
+        // Client-side validation
         if (!email || !password || !confirmPassword) {
-            alert('Please enter both email and password.');
+            setNotification({ message: 'Please fill in all fields.', type: 'error' });
             return;
         }
-        if (password == confirmPassword) {
-            alert(`Signing up with:\nEmail: ${email}\nPassword: ${password}`);
-            // Reset fields after submission
+        if (password !== confirmPassword) {
+            setNotification({ message: 'Passwords do not match.', type: 'error' });
+            return;
+        }
+
+        setIsLoading(true);
+
+        try {
+            // API Call to your backend server
+            const response = await fetch('http://localhost:3000/api/signup', { // Corrected URL
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Something went wrong.');
+            }
+
+            setNotification({ message: 'Account created successfully!', type: 'success' });
             setEmail('');
             setPassword('');
-        } else {
-            alert(`Your Password and Confirm Password do not match.`);
+            setConfirmPassword('');
+
+        } catch (err) {
+            setNotification({ message: err.message, type: 'error' });
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -86,6 +152,10 @@ const Signup = () => {
                     stroke-dasharray: 1000;
                     stroke-dashoffset: 1000;
                     animation: draw 1.5s ease-out forwards;
+                }
+
+                .animate-slideIn {
+                    animation: slideIn 0.5s ease-out forwards;
                 }
 
                 @keyframes fadeIn {
@@ -127,6 +197,15 @@ const Signup = () => {
                 }
                 `}
             </style>
+
+            {/* Render the Notification component when there is a message */}
+            {notification && (
+                <Notification
+                    message={notification.message}
+                    type={notification.type}
+                    onClose={() => setNotification(null)}
+                />
+            )}
 
             {/* Left side with the animation */}
             <SignupVisualAnimation />
@@ -181,16 +260,21 @@ const Signup = () => {
                             type="password"
                             placeholder="Confirm Password"
                             value={confirmPassword}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
                             className="w-full px-4 py-3 bg-black border border-white/30 rounded-md text-white placeholder-white/50 focus:outline-none focus:ring-1 focus:ring-white transition-all"
                             required
                         />
                     </div>
+                    {/* Feedback Messages */}
+                    {error && <p className="text-red-400 text-sm text-left">{error}</p>}
+                    {successMessage && <p className="text-green-400 text-sm text-left">{successMessage}</p>}
+
                     <button
                         type="submit"
-                        className="w-full bg-white text-black px-6 py-3 rounded-md text-lg font-bold hover:bg-gray-200 transition-all duration-300 transform hover:scale-105"
+                        disabled={isLoading}
+                        className="w-full bg-white text-black px-6 py-3 rounded-md text-lg font-bold hover:bg-gray-200 transition-all duration-300 transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed"
                     >
-                        Create Account
+                        {isLoading ? 'Creating Account...' : 'Create Account'}
                     </button>
                 </form>
 

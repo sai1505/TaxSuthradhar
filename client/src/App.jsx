@@ -5,6 +5,8 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Signup from './components/Auth/Signup';
 import Signin from './components/Auth/Signin';
+import UserDashboardLayout from './components/User/UserDashboardLayout';
+import UserDashboard from './components/User/UserDashboard';
 
 function App() {
   return (
@@ -19,6 +21,10 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/signin" element={<Signin />} />
+            <Route path="/dashboard" element={<UserDashboardLayout />}>
+              {/* The index route renders the UserDashboard (chat) at /dashboard */}
+              <Route index element={<UserDashboard />} />
+            </Route>
             <Route path="*" element={<Home />} />
           </Routes>
         </main>

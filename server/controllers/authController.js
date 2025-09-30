@@ -14,46 +14,65 @@ const streamToString = (stream) =>
 
 export const signupUser = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { username, email, password } = req.body;
 
-        if (!email || !password) {
-            return res.status(400).json({ message: 'Email and password are required.' });
+        // 1. Updated Validation
+        if (!username || !email || !password) {
+            return res.status(400).json({ message: 'Username, email, and password are required.' });
         }
 
-        // 1. Check if the user already exists using HeadObjectCommand
+        // 2. Define Keys for the main data and the index
+        const userKey = `users/${email}`;
+        const usernameKey = `usernames/${username}`;
+
+        // 3. Check if Email is already registered
         try {
-            const headCommand = new HeadObjectCommand({
-                Bucket: R2_BUCKET_NAME,
-                Key: email,
-            });
-            await S3.send(headCommand);
+            await S3.send(new HeadObjectCommand({ Bucket: R2_BUCKET_NAME, Key: userKey }));
             return res.status(409).json({ message: 'Email is already registered.' });
-
         } catch (error) {
-            if (error.name !== 'NotFound') {
-                throw error;
-            }
+            if (error.name !== 'NotFound') throw error; // Re-throw unexpected errors
         }
 
-        // 2. Securely Hash the Password
+        // 4. Check if Username is already taken
+        try {
+            await S3.send(new HeadObjectCommand({ Bucket: R2_BUCKET_NAME, Key: usernameKey }));
+            return res.status(409).json({ message: 'Username is already taken.' });
+        } catch (error) {
+            if (error.name !== 'NotFound') throw error; // Re-throw unexpected errors
+        }
+
+        // 5. Securely Hash the Password
         const saltRounds = 10;
         const passwordHash = await bcrypt.hash(password, saltRounds);
 
-        // 3. Prepare User Data for Storage
+        // 6. Prepare User Data for Storage (now includes username)
         const userData = {
+            username,
             email,
             passwordHash,
             createdAt: new Date().toISOString(),
         };
 
-        // 4. Upload the New User Data to R2
-        const putCommand = new PutObjectCommand({
+        // 7. Prepare commands to create BOTH the user object and the username index object
+        const putUserCommand = new PutObjectCommand({
             Bucket: R2_BUCKET_NAME,
-            Key: email,
+            Key: userKey,
             Body: JSON.stringify(userData),
             ContentType: 'application/json',
         });
-        await S3.send(putCommand);
+
+        const putUsernameIndexCommand = new PutObjectCommand({
+            Bucket: R2_BUCKET_NAME,
+            Key: usernameKey,
+            Body: JSON.stringify({ email: email }), // Store the email as a reference
+            ContentType: 'application/json',
+        });
+
+        // 8. Execute both uploads concurrently
+        await Promise.all([
+            S3.send(putUserCommand),
+            S3.send(putUsernameIndexCommand)
+        ]);
 
         res.status(201).json({ success: true, message: 'Account created successfully.' });
 
@@ -73,20 +92,19 @@ export const signinUser = async (req, res) => {
             return res.status(400).json({ message: 'Email and password are required.' });
         }
 
-        // 1. Find the user in the R2 bucket
+        // 1. Find the user in the R2 bucket using the NEW key structure
+        const userKey = `users/${email}`; // ⬅️ UPDATED
         let userObject;
         try {
             const getCommand = new GetObjectCommand({
                 Bucket: R2_BUCKET_NAME,
-                Key: email,
+                Key: userKey, // ⬅️ UPDATED
             });
             userObject = await S3.send(getCommand);
         } catch (error) {
-            // If user object is not found, it's an invalid login attempt
             if (error.name === 'NoSuchKey') {
                 return res.status(401).json({ message: 'Invalid credentials.' });
             }
-            // For other errors, throw them to be caught by the outer catch block
             throw error;
         }
 
@@ -98,16 +116,15 @@ export const signinUser = async (req, res) => {
         const isPasswordCorrect = await bcrypt.compare(password, userData.passwordHash);
 
         if (!isPasswordCorrect) {
-            // If passwords don't match, it's an invalid login attempt
             return res.status(401).json({ message: 'Invalid credentials.' });
         }
 
-        // 4. Send Success Response
-        // In a real app, you would generate and send a JWT (JSON Web Token) here.
+        // 4. Send Success Response (now includes username)
         res.status(200).json({
             success: true,
             message: 'Sign-in successful.',
             user: {
+                username: userData.username, // ⬅️ ADDED
                 email: userData.email,
                 createdAt: userData.createdAt
             }

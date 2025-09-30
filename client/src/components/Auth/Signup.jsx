@@ -39,7 +39,7 @@ const Notification = ({ message, type, onClose }) => {
 
     return (
         <div
-            className={`fixed bottom-20 right-5 flex items-center p-4 w-full max-w-xs text-black bg-white rounded-lg shadow-lg animate-slideIn`}
+            className={`fixed bottom-10 right-5 flex items-center p-4 w-full max-w-xs text-black bg-white rounded-lg shadow-lg animate-slideIn`}
             role="alert"
         >
             <div className="text-sm font-normal">{message}</div>
@@ -62,6 +62,7 @@ const Notification = ({ message, type, onClose }) => {
 const Signup = () => {
     // State to hold email and password input data
     const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -105,7 +106,7 @@ const Signup = () => {
         setNotification(null);
 
         // Client-side validation
-        if (!email || !password || !confirmPassword) {
+        if (!username || !email || !password || !confirmPassword) {
             setNotification({ message: 'Please fill in all fields.', type: 'error' });
             return;
         }
@@ -121,7 +122,7 @@ const Signup = () => {
             const response = await fetch('http://localhost:3000/api/signup', { // Corrected URL
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ username, email, password }),
             });
 
             const data = await response.json();
@@ -132,6 +133,7 @@ const Signup = () => {
 
             setNotification({ message: 'Account created successfully!', type: 'success' });
             setEmail('');
+            setUsername('');
             setPassword('');
             setConfirmPassword('');
 
@@ -243,6 +245,16 @@ const Signup = () => {
                             placeholder="Email Address"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            className="w-full px-4 py-3 bg-black border border-white/30 rounded-md text-white placeholder-white/50 focus:outline-none focus:ring-1 focus:ring-white transition-all"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <input
+                            type="text"
+                            placeholder="Username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                             className="w-full px-4 py-3 bg-black border border-white/30 rounded-md text-white placeholder-white/50 focus:outline-none focus:ring-1 focus:ring-white transition-all"
                             required
                         />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
     GoogleAuthProvider,
     signInWithPopup,
@@ -39,7 +39,7 @@ const Notification = ({ message, type, onClose }) => {
 
     return (
         <div
-            className={`fixed bottom-30 right-5 flex items-center p-4 w-full max-w-xs text-black bg-white rounded-lg shadow-lg animate-slideIn`}
+            className={`fixed bottom-20 right-5 flex items-center p-4 w-full max-w-xs text-black bg-white rounded-lg shadow-lg animate-slideIn`}
             role="alert"
         >
             <div className="text-sm font-normal">{message}</div>
@@ -65,6 +65,8 @@ const Signin = () => {
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [notification, setNotification] = useState(null);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (notification) {
@@ -120,6 +122,7 @@ const Signin = () => {
             }
 
             setNotification({ message: 'Sign-in successful!', type: 'success' });
+            navigate('/dashboard');
 
         } catch (err) {
             setNotification({ message: err.message, type: 'error' });

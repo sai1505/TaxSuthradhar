@@ -87,16 +87,34 @@ const Signup = () => {
     const handleGoogleSignIn = async () => {
         const provider = new GoogleAuthProvider();
         try {
+            // 1. Authenticate with Google
             const result = await signInWithPopup(auth, provider);
-            // The signed-in user info.
             const user = result.user;
-            console.log("Google Sign-In Success:", user);
-            alert(`Welcome, ${user.displayName}!`);
-            // Redirect user to the dashboard or home page after successful sign-in
+
+            // 2. Send user data to your backend
+            const response = await fetch('http://localhost:3000/api/googleSignin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: user.email,
+                    username: user.displayName,
+                    googleUid: user.uid
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to sync Google user with backend.');
+            }
+
+            // 3. Set the session and navigate to the profile page
+            console.log("Backend response:", data.message);
+            sessionStorage.setItem('userEmail', user.email);
             navigate('/dashboard');
+
         } catch (error) {
-            // Handle Errors here.
-            console.error("Google Sign-In Error:", error);
+            console.error("Google Sign-In Flow Error:", error);
             alert(`Error: ${error.message}`);
         }
     };
@@ -252,7 +270,7 @@ const Signup = () => {
                     <div>
                         <input
                             type="text"
-                            placeholder="Username"
+                            placeholder="Name"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             className="w-full px-4 py-3 bg-black border border-white/30 rounded-md text-white placeholder-white/50 focus:outline-none focus:ring-1 focus:ring-white transition-all"

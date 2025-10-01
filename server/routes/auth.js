@@ -1,5 +1,5 @@
 import express from 'express';
-import { signupUser, signinUser, userProfile } from '../controllers/authController.js';
+import { signupUser, signinUser, userProfile, googleSignInUser } from '../controllers/authController.js';
 
 const router = express.Router();
 
@@ -14,6 +14,12 @@ router.post('/signup', signupUser);
  * @desc    Authenticate a user
  */
 router.post('/signin', signinUser);
+
+/**
+ * @route   POST /googleSignin
+ * @desc    Authenticate a user
+ */
+router.post('/googleSignin', googleSignInUser);
 
 /**
  * @route   POST /userProfile

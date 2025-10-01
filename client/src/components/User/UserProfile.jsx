@@ -141,7 +141,7 @@ const UserProfile = () => {
                 <form className="space-y-6">
                     {/* Username Field (Disabled) */}
                     <div>
-                        <label htmlFor="username" className="block text-sm font-medium text-white/70 mb-2 text-left">Username</label>
+                        <label htmlFor="username" className="block text-sm font-medium text-white/70 mb-2 text-left">Name</label>
                         <input
                             id="username"
                             type="text"

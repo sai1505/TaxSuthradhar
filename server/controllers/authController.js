@@ -23,20 +23,11 @@ export const signupUser = async (req, res) => {
 
         // 2. Define Keys for the main data and the index
         const userKey = `users/${email}`;
-        const usernameKey = `usernames/${username}`;
 
         // 3. Check if Email is already registered
         try {
             await S3.send(new HeadObjectCommand({ Bucket: R2_BUCKET_NAME, Key: userKey }));
             return res.status(409).json({ message: 'Email is already registered.' });
-        } catch (error) {
-            if (error.name !== 'NotFound') throw error; // Re-throw unexpected errors
-        }
-
-        // 4. Check if Username is already taken
-        try {
-            await S3.send(new HeadObjectCommand({ Bucket: R2_BUCKET_NAME, Key: usernameKey }));
-            return res.status(409).json({ message: 'Username is already taken.' });
         } catch (error) {
             if (error.name !== 'NotFound') throw error; // Re-throw unexpected errors
         }
@@ -61,17 +52,9 @@ export const signupUser = async (req, res) => {
             ContentType: 'application/json',
         });
 
-        const putUsernameIndexCommand = new PutObjectCommand({
-            Bucket: R2_BUCKET_NAME,
-            Key: usernameKey,
-            Body: JSON.stringify({ email: email }), // Store the email as a reference
-            ContentType: 'application/json',
-        });
-
         // 8. Execute both uploads concurrently
         await Promise.all([
             S3.send(putUserCommand),
-            S3.send(putUsernameIndexCommand)
         ]);
 
         res.status(201).json({ success: true, message: 'Account created successfully.' });
@@ -132,6 +115,68 @@ export const signinUser = async (req, res) => {
 
     } catch (error) {
         console.error('Signin Controller Error:', error);
+        res.status(500).json({ message: 'An internal server error occurred.' });
+    }
+};
+
+export const googleSignInUser = async (req, res) => {
+    try {
+        // Get user details sent from the frontend
+        const { email, username, googleUid } = req.body;
+
+        if (!email || !username || !googleUid) {
+            return res.status(400).json({ message: 'User details from Google are required.' });
+        }
+
+        const userKey = `users/${email}`;
+
+        // Check if the user already exists
+        try {
+            await S3.send(new HeadObjectCommand({ Bucket: R2_BUCKET_NAME, Key: userKey }));
+            // If the user exists, we can consider them signed in.
+            console.log(`Returning user signed in with Google: ${email}`);
+
+        } catch (error) {
+            // If user is not found, create a new entry for them
+            if (error.name === 'NotFound') {
+                console.log(`New user signing up with Google: ${email}`);
+
+                const userData = {
+                    username,
+                    email,
+                    googleUid, // Store the Google User ID instead of a password
+                    createdAt: new Date().toISOString(),
+                };
+
+
+                // Create the user object
+                const putUserCommand = new PutObjectCommand({
+                    Bucket: R2_BUCKET_NAME,
+                    Key: userKey,
+                    Body: JSON.stringify(userData),
+                    ContentType: 'application/json',
+                });
+
+                // Upload both to R2
+                await Promise.all([
+                    S3.send(putUserCommand),
+                ]);
+
+            } else {
+                // Re-throw any other unexpected errors
+                throw error;
+            }
+        }
+
+        // Send a success response in both cases (login or new signup)
+        res.status(200).json({
+            success: true,
+            message: 'Google sign-in successful.',
+            user: { email, username } // Send back the user details
+        });
+
+    } catch (error) {
+        console.error('Google Sign-In Controller Error:', error);
         res.status(500).json({ message: 'An internal server error occurred.' });
     }
 };

@@ -86,6 +86,7 @@ const Signin = () => {
             const user = result.user;
             console.log("Google Sign-In Success:", user);
             alert(`Welcome back, ${user.displayName}!`);
+            sessionStorage.setItem('userEmail', user.email);
             // Redirect user to the dashboard or home page
             navigate('/dashboard');
         } catch (error) {
@@ -122,6 +123,7 @@ const Signin = () => {
             }
 
             setNotification({ message: 'Sign-in successful!', type: 'success' });
+            sessionStorage.setItem('userEmail', data.user.email);
             navigate('/dashboard');
 
         } catch (err) {

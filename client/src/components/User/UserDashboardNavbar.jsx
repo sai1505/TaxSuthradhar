@@ -20,6 +20,7 @@ const UserDashboardNavbar = () => {
     // Placeholder for sign-out logic
     const handleSignOut = () => {
         console.log("User signed out");
+        sessionStorage.removeItem('userEmail');
         handleLinkClick();
         // Add your sign-out logic here (e.g., clear tokens, call API)
         navigate('/signin'); // Redirect to sign-in page after sign-out

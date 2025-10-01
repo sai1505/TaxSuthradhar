@@ -135,3 +135,43 @@ export const signinUser = async (req, res) => {
         res.status(500).json({ message: 'An internal server error occurred.' });
     }
 };
+
+export const userProfile = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ message: 'Email parameter is required.' });
+        }
+
+        const userKey = `users/${email}`;
+        let userObject;
+
+        try {
+            const getCommand = new GetObjectCommand({ Bucket: R2_BUCKET_NAME, Key: userKey });
+            userObject = await S3.send(getCommand);
+        } catch (error) {
+            if (error.name === 'NoSuchKey') {
+                return res.status(404).json({ message: 'User not found.' });
+            }
+            throw error; // Re-throw other errors
+        }
+
+        const userDataString = await streamToString(userObject.Body);
+        const userData = JSON.parse(userDataString);
+
+        // IMPORTANT: Send back only the necessary, non-sensitive data.
+        // DO NOT send the passwordHash.
+        res.status(200).json({
+            success: true,
+            user: {
+                username: userData.username,
+                email: userData.email,
+                createdAt: userData.createdAt
+            }
+        });
+
+    } catch (error) {
+        console.error('Get User Profile Error:', error);
+        res.status(500).json({ message: 'An internal server error occurred.' });
+    }
+};

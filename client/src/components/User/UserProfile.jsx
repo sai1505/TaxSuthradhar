@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // NEW: 2D Animation for the User Profile
 // This animation evokes a sense of user identity, data, and security.
@@ -56,9 +57,57 @@ const UserProfileAnimation = () => (
 
 
 const UserProfile = () => {
-    // Pre-assigned and disabled values
-    const [username] = useState('JohnDoe123');
-    const [email] = useState('john.doe@example.com');
+    const [username, setUsername] = useState('Loading...');
+    const [email, setEmail] = useState('Loading...');
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
+
+    // --- apiClient is now integrated inside the UserProfile component ---
+    const apiClient = {
+        getUserProfile: async (email) => {
+            // This function calls your backend to get the user's profile data.
+            // It assumes your backend has a POST /api/profile endpoint.
+            const response = await fetch(`http://localhost:3000/api/profile`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email })
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to fetch profile.');
+            }
+            return response.json();
+        }
+    };
+
+    useEffect(() => {
+        const loggedInUserEmail = sessionStorage.getItem('userEmail');
+        if (!loggedInUserEmail) {
+            handleSignOut(); // Redirect to signin if no user is logged in
+            return;
+        }
+
+        const fetchProfile = async () => {
+            try {
+                const data = await apiClient.getUserProfile(loggedInUserEmail);
+                if (data.success) {
+                    setUsername(data.user.username);
+                    setEmail(data.user.email);
+                }
+            } catch (err) {
+                setError(err.message);
+                setUsername('Error');
+                setEmail('Error');
+            }
+        };
+
+        fetchProfile();
+    }, []);
+
+    const handleSignOut = () => {
+        sessionStorage.removeItem('userEmail');
+        navigate('/signin');
+    };
 
     return (
         <div className="min-h-screen bg-black text-white flex flex-col lg:flex-row items-center justify-center p-4">

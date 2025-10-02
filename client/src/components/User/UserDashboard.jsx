@@ -1,10 +1,34 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { PaperAirplaneIcon, DocumentArrowUpIcon, UserIcon, SparklesIcon } from '@heroicons/react/24/solid';
+import { useChat } from './UserChatContext';
+
+// Using inline SVGs for icons to keep it self-contained
+const PaperAirplaneIcon = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
+    </svg>
+);
+
+const DocumentArrowUpIcon = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path fillRule="evenodd" d="M11.47 2.47a.75.75 0 011.06 0l4.5 4.5a.75.75 0 01-1.06 1.06l-3.22-3.22V16.5a.75.75 0 01-1.5 0V4.81L8.03 8.03a.75.75 0 01-1.06-1.06l4.5-4.5zM3 15.75a.75.75 0 01.75.75v2.25a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5V16.5a.75.75 0 011.5 0v2.25a3 3 0 01-3 3H5.25a3 3 0 01-3-3V16.5a.75.75 0 01.75-.75z" clipRule="evenodd" />
+    </svg>
+);
+
+const UserIcon = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
+    </svg>
+);
+
+const SparklesIcon = (props) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.007z" clipRule="evenodd" />
+    </svg>
+);
+
 
 const UserDashboard = () => {
-    const [messages, setMessages] = useState([]);
-    const [input, setInput] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const { messages, isLoading, input, setInput, handleSendMessage } = useChat();
     const chatEndRef = useRef(null);
     const inputRef = useRef(null);
 
@@ -34,27 +58,6 @@ const UserDashboard = () => {
         </div>
     );
 
-
-    const handleSendMessage = (e, messageText = input) => {
-        if (e) e.preventDefault();
-        if (!messageText.trim() || isLoading) return;
-
-        // Add user message
-        const newUserMessage = { id: Date.now(), text: messageText, sender: 'user' };
-        setMessages(prev => [...prev, newUserMessage]);
-        setInput('');
-        setIsLoading(true);
-
-        // Simulate AI response
-        setTimeout(() => {
-            const aiResponse = { id: Date.now() + 1, text: `This is a simulated AI response to: "${messageText}"`, sender: 'ai' };
-            setMessages(prev => [...prev, aiResponse]);
-            setIsLoading(false);
-            // Refocus input after response
-            inputRef.current?.focus();
-        }, 1500);
-    };
-
     const examplePrompts = [
         "Explain capital gains tax.",
         "What documents do I need for ITR?",
@@ -67,7 +70,7 @@ const UserDashboard = () => {
 
     return (
         <div className="h-full w-full flex flex-col items-center bg-black text-white">
-            {/* Chat Display Area - Uses flex-1 to grow and fill available space */}
+            {/* Chat Display Area */}
             <div className="w-full max-w-3xl flex-1 overflow-y-auto p-4 custom-scrollbar">
                 {messages.length === 0 ? (
                     // Welcome Screen
@@ -90,7 +93,7 @@ const UserDashboard = () => {
                     </div>
                 ) : (
                     // Chat Messages container
-                    <div className="space-y-6 mt-40">
+                    <div className="space-y-6 pt-10 pb-10">
                         {messages.map((msg) => (
                             <div key={msg.id} className={`flex items-start gap-4 ${msg.sender === 'user' ? 'justify-end' : ''}`}>
                                 {msg.sender === 'ai' && <AIAvatar />}
@@ -109,7 +112,7 @@ const UserDashboard = () => {
                 )}
             </div>
 
-            {/* Input Area - No longer positioned absolutely */}
+            {/* Input Area */}
             <div className="w-full flex-shrink-0 flex justify-center p-4 bg-gradient-to-t from-black via-black to-transparent">
                 <div className="w-full max-w-3xl">
                     <form onSubmit={handleSendMessage} className="relative flex items-center">
@@ -154,7 +157,8 @@ const UserDashboard = () => {
                 </div>
             </div>
 
-            <style jsx>{`
+            <style jsx global>{`
+                body, html, #root { height: 100%; margin: 0; font-family: sans-serif; }
                 .custom-scrollbar::-webkit-scrollbar { width: 6px; }
                 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
                 .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(255, 255, 255, 0.2); border-radius: 10px; }
@@ -165,4 +169,3 @@ const UserDashboard = () => {
 };
 
 export default UserDashboard;
-

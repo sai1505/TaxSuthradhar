@@ -8,6 +8,8 @@ import Signin from './components/Auth/Signin';
 import UserDashboardLayout from './components/User/UserDashboardLayout';
 import UserDashboard from './components/User/UserDashboard';
 import UserProfile from './components/User/UserProfile';
+import UserHistory from './components/User/UserHistory';
+import UserDocuments from './components/User/UserDocuments';
 
 function App() {
   return (
@@ -26,6 +28,8 @@ function App() {
               {/* The index route renders the UserDashboard (chat) at /dashboard */}
               <Route index element={<UserDashboard />} />
               <Route path="profile" element={<UserProfile />} />
+              <Route path="history" element={<UserHistory />} />
+              <Route path="documents" element={<UserDocuments />} />
             </Route>
             <Route path="*" element={<Home />} />
           </Routes>

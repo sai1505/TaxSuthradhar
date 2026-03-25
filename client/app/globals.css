@@ -1,0 +1,32 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
+
+@import "tailwindcss";
+
+/* ── Design Tokens — Tailwind v4 uses @theme instead of tailwind.config ── */
+@theme {
+  --color-primary-blue: #1E3A8A;
+  --color-success-green: #10B981;
+  --color-slate-gray: #334155;
+  --color-warning-amber: #F59E0B;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ── Base styles ── */
+html {
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #ffffff;
+  color: #334155;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+html.dark body {
+  background-color: #000000;
+  color: #f1f5f9;
+}

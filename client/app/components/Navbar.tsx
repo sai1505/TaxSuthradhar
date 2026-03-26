@@ -6,25 +6,46 @@ import { usePathname } from "next/navigation";
 import { Sun, Moon, Menu, X, Zap } from "lucide-react";
 import { useTheme } from "./Theme/ThemeProvider";
 
-/* ═══════════════════════════════════════════════════════════════
-   Navbar — TaxSuthradhar
-   ─ Tailwind v4: dark: variants via @custom-variant
-   ─ Theme driven by useTheme() from ThemeProvider
-   ─ bg-brand-gradient etc. come from @theme in globals.css
-   ═══════════════════════════════════════════════════════════════ */
-
 const NAV_LINKS = [
-    { label: "Home", href: "/" },
-    { label: "About", href: "/about" },
-    { label: "The Problem", href: "/solution" },
-    { label: "The Solution", href: "/pricing" },
+    { label: "Home", href: "#home" },
+    { label: "Product", href: "#product" },
+    { label: "Problem", href: "#problem" },
+    { label: "Solution", href: "#solution" },
+    { label: "Benefits", href: "#benefits" },
 ];
 
 export default function Navbar() {
     const { isDark, toggle } = useTheme();
+    const [activeSection, setActiveSection] = useState("#home");
     const [mobileOpen, setMobileOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const pathname = usePathname();
+
+    useEffect(() => {
+        const sections = ["home", "product", "problem", "solution", "benefits"];
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        setActiveSection(`#${entry.target.id}`);
+                    }
+                });
+            },
+            {
+                root: null,
+                rootMargin: "-40% 0px -50% 0px", // controls trigger point
+                threshold: 0,
+            }
+        );
+
+        sections.forEach((id) => {
+            const el = document.getElementById(id);
+            if (el) observer.observe(el);
+        });
+
+        return () => observer.disconnect();
+    }, []);
 
     useEffect(() => {
         const handler = () => setScrolled(window.scrollY > 12);
@@ -40,7 +61,7 @@ export default function Navbar() {
             {/* ── ANNOUNCEMENT BANNER ──────────────────────────────── */}
             <div className="w-full bg-banner-gradient py-2 px-4 text-center">
                 <span className="text-xs sm:text-sm font-medium tracking-wide text-white/90">
-                    🇮🇳&nbsp; India&apos;s AI-powered tax compliance assistant
+                    India&apos;s AI-powered tax compliance assistant
                     <span className="text-white/90 font-bold ml-1">
                         — File smarter, save more.
                     </span>
@@ -80,11 +101,12 @@ export default function Navbar() {
                         {/* ── DESKTOP NAV LINKS ─────────────────────────── */}
                         <ul className="hidden md:flex items-center gap-0.5">
                             {NAV_LINKS.map(({ label, href }) => {
-                                const active = pathname === href;
+                                const active = activeSection === href;
                                 return (
                                     <li key={href}>
                                         <Link
                                             href={href}
+                                            onClick={() => setActiveSection(href)}
                                             className={[
                                                 "relative px-4 py-2 rounded-lg text-sm block transition-all duration-200",
                                                 active

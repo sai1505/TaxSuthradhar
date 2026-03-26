@@ -3,15 +3,15 @@ import { Mail } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 
 const SOCIAL = [
-    { Icon: FaGithub, href: "#", label: "GitHub" },
-    { Icon: Mail, href: "#", label: "Email" },
+    { Icon: FaGithub, href: "https://github.com/sai1505/TaxSuthradhar", label: "GitHub" },
+    { Icon: Mail, href: "mailto:vsai1505.bona@gmail.com", label: "Email" }
 ];
 
 export default function Footer() {
     const year = new Date().getFullYear();
 
     return (
-        <footer className="fixed bottom-0 left-0 w-full bg-white dark:bg-black border-t border-black/[0.06] dark:border-white/[0.06]">
+        <footer className="bg-white dark:bg-black border-t border-black/[0.06] dark:border-white/[0.06]">
 
             {/* Divider */}
             <div className="container-page">
@@ -42,13 +42,11 @@ export default function Footer() {
                                 key={label}
                                 href={href}
                                 aria-label={label}
-                                className="flex items-center justify-center w-9 h-9 rounded-lg 
-                                    border border-black/[0.08] dark:border-white/[0.08]
-                                    text-black/50 dark:text-white/40
-                                    hover:text-emerald-500 dark:hover:text-emerald-400
-                                    hover:border-emerald-500/40
-                                    hover:bg-emerald-500/10 dark:hover:bg-emerald-500/8
-                                    transition-all duration-200"
+                                className="
+                                    w-9 h-9 min-w-[36px] min-h-[36px]
+                                    flex items-center justify-center
+                                    btn-primary-icon
+                                    "
                             >
                                 <Icon className="w-4 h-4" />
                             </a>

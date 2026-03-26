@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import "../globals.css";
 import { Inter } from "next/font/google";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import ThemeProvider from "../components/Theme/ThemeProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -41,7 +44,13 @@ export default function RootLayout({
         <meta name="theme-color" content="#ffffff" />
       </head>
       <body className="flex flex-col min-h-screen flex flex-col bg-white dark:bg-black text-neutral-900 dark:text-neutral-50 transition-colors duration-300">
-        {children}
+        <ThemeProvider>
+          <Navbar />
+
+          {children}
+
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );

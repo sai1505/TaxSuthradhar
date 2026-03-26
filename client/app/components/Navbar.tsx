@@ -3,15 +3,15 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Sun, Moon, Menu, X, Zap } from "lucide-react";
+import { Sun, Moon, Menu, X, Zap, LogIn, UserPlus } from "lucide-react";
 import { useTheme } from "./Theme/ThemeProvider";
 
 const NAV_LINKS = [
-    { label: "Home", href: "#home" },
-    { label: "Product", href: "#product" },
-    { label: "Problem", href: "#problem" },
-    { label: "Solution", href: "#solution" },
-    { label: "Benefits", href: "#benefits" },
+    { label: "Home", href: "/#home" },
+    { label: "Product", href: "/#product" },
+    { label: "Problem", href: "/#problem" },
+    { label: "Solution", href: "/#solution" },
+    { label: "Benefits", href: "/#benefits" },
 ];
 
 export default function Navbar() {
@@ -28,7 +28,7 @@ export default function Navbar() {
             (entries) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
-                        setActiveSection(`#${entry.target.id}`);
+                        setActiveSection(`/#${entry.target.id}`);
                     }
                 });
             },
@@ -46,6 +46,12 @@ export default function Navbar() {
 
         return () => observer.disconnect();
     }, []);
+
+    useEffect(() => {
+        if (pathname !== "/") {
+            setActiveSection(""); // remove active highlight
+        }
+    }, [pathname]);
 
     useEffect(() => {
         const handler = () => setScrolled(window.scrollY > 12);
@@ -144,15 +150,22 @@ export default function Navbar() {
                             </button>
 
                             {/* Login — gradient outline */}
-                            <Link href="/login" className="btn-outline hidden sm:inline-flex">
+                            <Link
+                                href="/auth/signin"
+                                className="btn-outline hidden sm:inline-flex items-center gap-2 "
+                            >
+                                <LogIn className="w-4 h-4 text-current relative z-10" />
                                 <span>Login</span>
                             </Link>
 
                             {/* Sign Up — gradient fill */}
-                            <Link href="/signup" className="btn-primary hidden sm:inline-flex">
-                                Sign Up
+                            <Link
+                                href="/auth/signup"
+                                className="btn-primary hidden sm:inline-flex items-center gap-2"
+                            >
+                                <UserPlus className="w-4 h-4" />
+                                <span>Sign Up</span>
                             </Link>
-
                             {/* Mobile hamburger */}
                             <button
                                 onClick={() => setMobileOpen((v) => !v)}

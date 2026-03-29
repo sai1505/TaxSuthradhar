@@ -403,4 +403,8 @@
     color: #34d399;
     border-color: rgba(16, 185, 129, 0.25);
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
 }

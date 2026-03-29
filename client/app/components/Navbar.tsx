@@ -7,11 +7,11 @@ import { Sun, Moon, Menu, X, Zap, LogIn, UserPlus } from "lucide-react";
 import { useTheme } from "./Theme/ThemeProvider";
 
 const NAV_LINKS = [
-    { label: "Home", href: "/#home" },
-    { label: "Product", href: "/#product" },
-    { label: "Problem", href: "/#problem" },
-    { label: "Solution", href: "/#solution" },
-    { label: "Benefits", href: "/#benefits" },
+    { label: "Home", id: "home" },
+    { label: "Product", id: "product" },
+    { label: "Problem", id: "problem" },
+    { label: "Solution", id: "solution" },
+    { label: "Benefits", id: "benefits" },
 ];
 
 export default function Navbar() {
@@ -28,13 +28,13 @@ export default function Navbar() {
             (entries) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
-                        setActiveSection(`/#${entry.target.id}`);
+                        setActiveSection(`#${entry.target.id}`);
                     }
                 });
             },
             {
                 root: null,
-                rootMargin: "-40% 0px -50% 0px", // controls trigger point
+                rootMargin: "-100px 0px -60% 0px", // 🔥 KEY FIX
                 threshold: 0,
             }
         );
@@ -52,6 +52,7 @@ export default function Navbar() {
             setActiveSection(""); // remove active highlight
         }
     }, [pathname]);
+
 
     useEffect(() => {
         const handler = () => setScrolled(window.scrollY > 12);
@@ -106,28 +107,19 @@ export default function Navbar() {
 
                         {/* ── DESKTOP NAV LINKS ─────────────────────────── */}
                         <ul className="hidden md:flex items-center gap-0.5">
-                            {NAV_LINKS.map(({ label, href }) => {
-                                const active = activeSection === href;
+                            {NAV_LINKS.map(({ label, id }) => {
+                                const active = activeSection === `#${id}`;
+                                const href = pathname === "/" ? `#${id}` : `/#${id}`;
                                 return (
-                                    <li key={href}>
+                                    <li key={id}>
                                         <Link
                                             href={href}
                                             onClick={() => setActiveSection(href)}
                                             className={[
-                                                "relative px-4 py-2 rounded-lg text-sm block transition-all duration-200",
-                                                active
-                                                    ? "font-semibold"
-                                                    : "font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900",
+                                                "relative px-4 py-2 rounded-lg text-sm block transition-all duration-200 font-medium text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-900",
                                             ].join(" ")}
                                         >
-                                            {active
-                                                ? <span className="gradient-text-active">{label}</span>
-                                                : label
-                                            }
-                                            {/* Active underline */}
-                                            {active && (
-                                                <span className="absolute bottom-0.5 left-4 right-4 h-0.5 rounded-full bg-active-gradient" />
-                                            )}
+                                            {label}
                                         </Link>
                                     </li>
                                 );
@@ -195,11 +187,13 @@ export default function Navbar() {
                     aria-hidden={!mobileOpen}
                 >
                     <div className="px-4 pt-3 pb-6 space-y-1">
-                        {NAV_LINKS.map(({ label, href }) => {
-                            const active = pathname === href;
+                        {NAV_LINKS.map(({ label, id }) => {
+                            const href = pathname === "/" ? `#${id}` : `/#${id}`;
+                            const active = activeSection === `#${id}`;
+
                             return (
                                 <Link
-                                    key={href}
+                                    key={id}
                                     href={href}
                                     className={[
                                         "flex items-center px-4 py-3 rounded-xl text-[0.95rem] transition-all duration-150",

@@ -140,9 +140,6 @@ export default function SignUpPage() {
     return (
         <>
             <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap');
-        * { font-family: 'Inter', sans-serif; }
-        h1, h2, h3, .font-display { font-family: 'Sora', sans-serif !important; }
         @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
         .fade-up { animation: fadeUp 0.5s ease both; }
         .fade-up-1 { animation-delay: 0.05s; }

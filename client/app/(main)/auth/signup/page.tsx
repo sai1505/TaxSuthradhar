@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import SignUpIllustration from "@/app/UI/SignUpIllustration";
+import { LockClosedIcon, EnvelopeIcon, UserIcon } from "@heroicons/react/24/outline";
+import { LockClosedIcon as LockSolid, EnvelopeIcon as EnvelopeSolid, UserIcon as UserSolid } from "@heroicons/react/24/solid";
 
 /*  Password Strength */
 const rules = [
@@ -47,11 +49,13 @@ function useCaptcha() {
 
 /* ─── Input Component ─── */
 function FormInput({
-    label, type = "text", value, onChange, placeholder, icon, extra
+    label, type = "text", value, onChange, placeholder, iconOutline, iconFilled, extra
 }: {
     label: string; type?: string; value: string;
     onChange: (v: string) => void; placeholder: string;
-    icon: string; extra?: React.ReactNode;
+    iconOutline: React.ReactNode;
+    iconFilled: React.ReactNode;
+    extra?: React.ReactNode;
 }) {
     const [show, setShow] = useState(false);
     const isPassword = type === "password";
@@ -59,7 +63,14 @@ function FormInput({
         <div className="flex flex-col gap-1.5">
             <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{label}</label>
             <div className="relative group">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-base pointer-events-none select-none">{icon}</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-base pointer-events-none select-none">
+                    <span className="group-focus-within:hidden">
+                        {iconOutline}
+                    </span>
+                    <span className="hidden group-focus-within:inline">
+                        {iconFilled}
+                    </span>
+                </span>
                 <input
                     type={isPassword && show ? "text" : type}
                     value={value}
@@ -67,8 +78,8 @@ function FormInput({
                     placeholder={placeholder}
                     className="
             w-full pl-11 pr-12 py-3.5 rounded-xl text-sm
-            bg-white dark:bg-[#0d1526]
-            border border-slate-200 dark:border-slate-700
+            bg-white dark:bg-black
+            border border-slate-200 dark:border-neutral-800
             focus:border-amber-400 dark:focus:border-amber-500
             focus:ring-2 focus:ring-amber-300/30 dark:focus:ring-amber-500/20
             outline-none transition-all duration-200
@@ -113,7 +124,7 @@ export default function SignUpPage() {
     if (submitted) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-white to-orange-50 dark:from-black dark:via-black dark:to-black">
-                <div className="text-center p-12 rounded-3xl bg-white dark:bg-[#0d1526] border border-amber-200 dark:border-amber-800 shadow-2xl max-w-md w-full mx-4">
+                <div className="text-center p-12 rounded-3xl bg-white dark:bg-black border border-amber-200 dark:border-amber-800 shadow-2xl max-w-md w-full mx-4">
                     <div className="text-6xl mb-6">🎉</div>
                     <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-3">Welcome aboard!</h2>
                     <p className="text-slate-500 dark:text-slate-400 mb-2">Your Tax Suthradhar account has been created.</p>
@@ -145,26 +156,15 @@ export default function SignUpPage() {
         @keyframes shimmer { 0%,100% { opacity:.6; } 50% { opacity:1; } }
       `}</style>
 
-            <div className="min-h-screen flex bg-gradient-to-br from-amber-50/40 via-white to-orange-50/30 dark:from-[#030712] dark:via-[#0a0f1e] dark:to-[#030712]">
+            <div className="min-h-screen flex bg-gradient-to-br from-amber-50/40 via-white to-orange-50/30 dark:from-black dark:via-black dark:to-black">
 
                 {/* ─── Left: Form ─── */}
                 <div className="flex-1 flex items-center justify-center px-6 py-12 overflow-y-auto">
                     <div className="w-full max-w-md">
 
-                        {/* Logo */}
-                        <div className="fade-up fade-up-1 mb-8">
-                            <div className="inline-flex items-center gap-2.5 mb-1">
-                                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-lg shadow-lg shadow-amber-300/40">
-                                    🧵
-                                </div>
-                                <span className="font-display text-xl font-black text-slate-900 dark:text-white">Tax Suthradhar</span>
-                            </div>
-                            <p className="text-xs text-slate-400 dark:text-slate-500 pl-12">Your Financial Thread of Clarity</p>
-                        </div>
-
                         {/* Heading */}
                         <div className="fade-up fade-up-2 mb-8">
-                            <h1 className="font-display text-3xl font-black text-slate-900 dark:text-white mb-1.5 leading-tight">
+                            <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-1.5 leading-tight">
                                 Create your account
                             </h1>
                             <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -179,23 +179,36 @@ export default function SignUpPage() {
 
                             {/* Google */}
                             <div className="fade-up fade-up-3">
-                                <button type="button" className="
-                  w-full flex items-center justify-center gap-3 py-3.5 rounded-xl
-                  border border-slate-200 dark:border-slate-700
-                  bg-white dark:bg-[#0d1526]
-                  hover:border-amber-300 dark:hover:border-amber-600
-                  hover:shadow-md
-                  text-slate-700 dark:text-white text-sm font-semibold
-                  transition-all duration-200 group
-                ">
-                                    <svg width="18" height="18" viewBox="0 0 24 24">
+                                <button
+                                    type="button"
+                                    className="
+                                        w-full flex items-center justify-center gap-2
+                                        py-3 px-4 rounded-xl
+                                        border border-slate-200 dark:border-neutral-800
+                                        bg-white dark:bg-black
+                                        hover:border-amber-300 dark:hover:border-amber-600
+                                        hover:shadow-md
+                                        text-slate-700 dark:text-white text-sm font-semibold
+                                        transition-all duration-200 group
+                                        "
+                                >
+                                    <svg
+                                        className="w-5 h-5 shrink-0"
+                                        viewBox="0 0 24 24"
+                                    >
                                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                                         <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
                                         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                                         <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                                     </svg>
-                                    Continue with Google
-                                    <span className="ml-auto text-slate-300 dark:text-slate-600 group-hover:text-amber-300 transition-colors text-xs">↗</span>
+
+                                    <span className="ms-5 me-5 text-center">
+                                        Continue with Google
+                                    </span>
+
+                                    <span className="text-slate-300 dark:text-slate-600 group-hover:text-amber-300 transition-colors text-md">
+                                        ↗
+                                    </span>
                                 </button>
                             </div>
 
@@ -208,20 +221,39 @@ export default function SignUpPage() {
 
                             {/* Display Name */}
                             <div className="fade-up fade-up-4">
-                                <FormInput label="Display Name" value={name} onChange={setName}
-                                    placeholder="e.g. Arjun Sharma" icon="👤" />
+                                <FormInput
+                                    label="Display Name"
+                                    value={name}
+                                    onChange={setName}
+                                    placeholder="e.g. Arjun Sharma"
+                                    iconOutline={<UserIcon className="w-5 h-5 text-amber-500 dark:text-amber-300" />}
+                                    iconFilled={<UserSolid className="w-5 h-5 text-amber-500 dark:text-amber-300" />}
+                                />
                             </div>
 
                             {/* Email */}
                             <div className="fade-up fade-up-4">
-                                <FormInput label="Email Address" type="email" value={email} onChange={setEmail}
-                                    placeholder="you@company.in" icon="📧" />
+                                <FormInput
+                                    label="Email Address"
+                                    type="email"
+                                    value={email}
+                                    onChange={setEmail}
+                                    placeholder="you@company.in"
+                                    iconOutline={<EnvelopeIcon className="w-5 h-5 text-amber-500 dark:text-amber-300" />}
+                                    iconFilled={<EnvelopeSolid className="w-5 h-5 text-amber-500 dark:text-amber-300" />}
+                                />
                             </div>
 
                             {/* Password */}
                             <div className="fade-up fade-up-5">
-                                <FormInput label="Password" type="password" value={password} onChange={setPassword}
-                                    placeholder="Create a strong password" icon="🔐"
+                                <FormInput
+                                    label="Password"
+                                    type="password"
+                                    value={password}
+                                    onChange={setPassword}
+                                    placeholder="Create a strong password"
+                                    iconOutline={<LockClosedIcon className="w-5 h-5 text-amber-500 dark:text-amber-300" />}
+                                    iconFilled={<LockSolid className="w-5 h-5 text-amber-500 dark:text-amber-300" />}
                                     extra={
                                         password.length > 0 ? (
                                             <div className="mt-2 space-y-2">
@@ -259,8 +291,14 @@ export default function SignUpPage() {
 
                             {/* Confirm Password */}
                             <div className="fade-up fade-up-5">
-                                <FormInput label="Confirm Password" type="password" value={confirm} onChange={setConfirm}
-                                    placeholder="Re-enter your password" icon="🔏"
+                                <FormInput
+                                    label="Confirm Password"
+                                    type="password"
+                                    value={confirm}
+                                    onChange={setConfirm}
+                                    placeholder="Re-enter your password"
+                                    iconOutline={<LockClosedIcon className="w-5 h-5 text-amber-500 dark:text-amber-300" />}
+                                    iconFilled={<LockSolid className="w-5 h-5 text-amber-500 dark:text-amber-300" />}
                                     extra={
                                         confirm.length > 0 ? (
                                             <p className={`text-[11px] mt-1.5 font-semibold ${passwordsMatch ? "text-emerald-500" : "text-red-400"}`}>
@@ -275,8 +313,8 @@ export default function SignUpPage() {
                             <div className="fade-up fade-up-6">
                                 <div className="
                   p-4 rounded-xl
-                  bg-amber-50/60 dark:bg-[#0d1526]
-                  border border-amber-100 dark:border-amber-900/40
+                  bg-amber-50/60 dark:bg-black
+                  border border-amber-100 dark:border-neutral-800
                 ">
                                     <div className="flex items-center gap-2 mb-3">
                                         <span className="text-base">🤖</span>
@@ -295,8 +333,8 @@ export default function SignUpPage() {
                                         <div className="flex items-center gap-3">
                                             <div className="
                         flex items-center gap-2 px-4 py-2.5 rounded-lg
-                        bg-white dark:bg-[#0a0f1e]
-                        border border-amber-200 dark:border-amber-800
+                        bg-white dark:bg-black
+                        border border-amber-200 dark:border-neutral-800
                         text-sm font-bold text-slate-700 dark:text-amber-300
                         select-none
                       ">
@@ -313,9 +351,9 @@ export default function SignUpPage() {
                                                 onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); check(); } }}
                                                 placeholder="Answer"
                                                 className="
-                          w-20 px-3 py-2.5 rounded-lg text-sm text-center font-bold
-                          bg-white dark:bg-[#0a0f1e]
-                          border border-slate-200 dark:border-slate-700
+                          w-25 px-3 py-2.5 rounded-lg text-sm text-center font-bold
+                          bg-white dark:bg-black
+                          border border-slate-200 dark:border-neutral-800
                           focus:border-amber-400 focus:ring-2 focus:ring-amber-300/20
                           outline-none transition-all
                           text-slate-800 dark:text-white
@@ -337,17 +375,6 @@ export default function SignUpPage() {
                                 </div>
                             </div>
 
-                            {/* Terms */}
-                            <div className="fade-up fade-up-7">
-                                <p className="text-[11px] text-slate-400 dark:text-slate-600 text-center leading-relaxed">
-                                    By creating an account you agree to our{" "}
-                                    <a href="#" className="text-amber-500 hover:underline font-medium">Terms of Service</a>
-                                    {" "}and{" "}
-                                    <a href="#" className="text-amber-500 hover:underline font-medium">Privacy Policy</a>
-                                    {" "}(DPDP Act 2026 compliant).
-                                </p>
-                            </div>
-
                             {/* Submit */}
                             <div className="fade-up fade-up-8">
                                 <button
@@ -358,7 +385,7 @@ export default function SignUpPage() {
                     transition-all duration-300
                     ${canSubmit
                                             ? "bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white shadow-xl shadow-amber-300/30 dark:shadow-amber-500/20 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-                                            : "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed"
+                                            : "bg-slate-100 dark:bg-neutral-900 text-slate-400 dark:text-neutral-400 cursor-not-allowed"
                                         }
                   `}
                                 >
@@ -370,33 +397,10 @@ export default function SignUpPage() {
                     </div>
                 </div>
 
-                {/* ─── Right: Illustration panel ─── */}
-                <div className="
-          hidden lg:flex flex-col items-center justify-center
-          w-[480px] xl:w-[520px] flex-shrink-0
-          bg-gradient-to-br from-amber-50 to-orange-50/60
-          dark:from-[#0a0f1e] dark:to-[#0d1220]
-          border-l border-amber-100 dark:border-amber-900/20
-          relative overflow-hidden
-        ">
-                    {/* Background grid */}
-                    <div className="absolute inset-0 opacity-20"
-                        style={{
-                            backgroundImage: `linear-gradient(rgba(245,158,11,0.12) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(245,158,11,0.12) 1px, transparent 1px)`,
-                            backgroundSize: "40px 40px"
-                        }}
-                    />
-                    <div className="relative z-10 p-8 w-full max-w-md">
+                {/* ─── Right: Illustration ─── */}
+                <div className="hidden lg:flex items-center justify-center px-8 mb-10 me-20">
+                    <div className="w-[420px] xl:w-[560px]">
                         <SignUpIllustration />
-                        <div className="mt-4 text-center">
-                            <p className="text-sm font-bold text-slate-600 dark:text-amber-400/80">
-                                Join 10,000+ salaried Indians
-                            </p>
-                            <p className="text-xs text-slate-400 dark:text-slate-600 mt-1">
-                                who understand their payslip for the first time
-                            </p>
-                        </div>
                     </div>
                 </div>
 

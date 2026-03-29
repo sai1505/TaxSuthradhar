@@ -148,7 +148,7 @@ function Section1Product() {
             and your Peace of Mind.
           </h2>
           <p className="text-lg text-slate-500 dark:text-slate-300 leading-relaxed mb-6">
-            Tax Suthradhar is an <strong className="text-slate-700 dark:text-white">AI-native financial companion</strong> built for the modern Indian employee. We don't just "calculate" numbers — we decode your payslip, translate tax jargon into human language, and chart your path to the correct ITR form.
+            Tax Suthradhar is an <strong className="text-slate-700 dark:text-white">AI-native financial companion</strong> built for the modern Indian employee. We don't just "calculate" numbers — we decode your payslip, translate tax jargon into human language, and suggest you to file the correct ITR form.
           </p>
           <p className="text-base text-slate-400 dark:text-slate-400 leading-relaxed border-l-4 border-amber-400 pl-5 italic">
             It's not just a tool — it's the <strong className="not-italic text-amber-500">thread (Sutra)</strong> that holds your financial compliance together.
@@ -432,7 +432,7 @@ function Section4Benefits() {
               {
                 emoji: "😌",
                 title: "Zero Anxiety",
-                desc: "No more 'Did I file the wrong form?' sleepless nights. Our engine checks everything before you submit.",
+                desc: "No more 'Did I file the wrong form?' sleepless nights. Our engine explains everything before you submit.",
                 stat: "0 Tax Notices",
                 color: "indigo",
               },

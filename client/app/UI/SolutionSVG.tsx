@@ -22,7 +22,7 @@ export default function SolutionSVG() {
             </defs>
 
             {/* ── Input PDF (left, slightly blurry) ── */}
-            <rect x="18" y="50" width="130" height="170" rx="10" fill="white" stroke="#e2e8f0" strokeWidth="1.5" className="dark:fill-[#1a2035] dark:stroke-slate-700" />
+            <rect x="18" y="50" width="130" height="180" rx="10" fill="white" stroke="#e2e8f0" strokeWidth="1.5" className="dark:fill-[#1a2035] dark:stroke-slate-700" />
             <rect x="18" y="50" width="130" height="28" rx="10" fill="#94a3b8" />
             <rect x="18" y="65" width="130" height="13" fill="#94a3b8" />
             <text x="83" y="68" textAnchor="middle" fontSize="10" fill="white" fontWeight="700">PDF PAYSLIP</text>
@@ -31,7 +31,7 @@ export default function SolutionSVG() {
                     <rect key={i} x="32" y={92 + i * 16} width={i % 2 === 0 ? 88 : 68} height="7" rx="3.5" fill="#94a3b8" />
                 ))}
             </g>
-            <text x="83" y="205" textAnchor="middle" fontSize="11" fill="#94a3b8">Unreadable…</text>
+            <text x="83" y="218" textAnchor="middle" fontSize="11" fill="#94a3b8">Unreadable…</text>
 
             {/* ── AI Scanner (center) ── */}
             {/* Outer ring */}

@@ -1,7 +1,7 @@
 
 export default function BenefitSVG() {
     return (
-        <svg viewBox="0 0 520 380" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 520 430" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <radialGradient id="winGrad" cx="50%" cy="50%" r="50%">
                     <stop offset="0%" stopColor="#fef3c7" />
@@ -64,8 +64,8 @@ export default function BenefitSVG() {
             ))}
 
             {/* "App for you" badge */}
-            <rect x="185" y="326" width="150" height="32" rx="16" fill="url(#goldBar)" />
-            <text x="260" y="347" textAnchor="middle" fontSize="11" fontWeight="800" fill="white">Accuracy → Authority 🎯</text>
+            <rect x="185" y="386" width="150" height="32" rx="16" fill="url(#goldBar)" />
+            <text x="262" y="406" textAnchor="middle" fontSize="11" fontWeight="800" fill="white">Accuracy → Authority 🎯</text>
         </svg>
     );
 }
